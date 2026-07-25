@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { GuessRow } from "./Components/GuessRow/GuessRow";
 import "./App.css";
+import { useWordleGame } from "./hooks/useGameStatus";
 
 const sampleGuesses: Guesses = [
   {
@@ -35,17 +36,19 @@ const BLANK_GUESSES: Guesses = Array(6)
 
 function App() {
   const [guesses, setGuesses] = useState<Guesses>(BLANK_GUESSES);
-
+  const { getInputProps } = useWordleGame("CRANE");
+  // console.log(inputRef);
   return (
     <>
       <h2>Wordle</h2>
       <div className="app">
         <div className="guesses">
-          {guesses.map(({ letters }) => (
-            <GuessRow letters={letters} />
+          {guesses.map(({ letters }, i) => (
+            <GuessRow letters={letters} key={`${i}`} />
           ))}
         </div>
       </div>
+      <input {...getInputProps()} autoComplete="off" />
     </>
   );
 }
