@@ -43,7 +43,7 @@ export const useWordleGame = (solution = "CRANE") => {
         position: "absolute",
         left: "-9999px",
         opacity: 0,
-      },
+      } as const,
       "aria-label": "Wordle guess input",
     }),
     [handleKey],
