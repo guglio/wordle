@@ -1,75 +1,84 @@
-# React + TypeScript + Vite
+# Wordle Clone
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A simple Wordle clone built with **React**, **TypeScript**, and **Vite**.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Hidden input technique to keep keyboard focus without showing a caret.
+- Real‑time letter validation with green/yellow/grey feedback.
+- Random word selection from a built‑in word list.
+- Responsive layout that works on desktop and mobile.
+- Easy to extend (custom word lists, animations, statistics, etc.).
 
-## React Compiler
+## Getting Started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Prerequisites
 
-## Expanding the ESLint configuration
+- Node.js (>=18) and npm (or yarn/pnpm).
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Installation
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+```bash
+# Clone the repository (if you haven't already)
+git clone https://github.com/guglio/wordle.git
+cd wordle
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+# Install dependencies
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Development
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+npm run dev
+```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+The app will be available at `http://localhost:5173`.
+
+### Build for Production
+
+```bash
+npm run build
+```
+
+The optimized output will be in the `dist/` folder.
+
+### Preview Production Build
+
+```bash
+npm run preview
+```
+
+## Project Structure
 
 ```
+src/
+ ├─ components/      # Reusable UI components (GuessRow, LetterTile, etc.)
+ ├─ hooks/           # Custom React hooks (useWordleGame)
+ ├─ types/           # TypeScript type definitions
+ ├─ App.tsx          # Root component
+ ├─ main.tsx         # Entry point
+ └─ styles/          # CSS / SCSS files
+```
+
+## How It Works
+
+1. A single hidden `<input>` captures all keyboard events.
+2. React state stores:
+   - `guesses`: submitted rows (each row = array of letter objects).
+   - `currentRow` / `currentCol`: position of the active tile.
+   - `draft`: the string being typed for the current row.
+   - `solution`: the secret word.
+3. On each keystroke we update `draft` (or submit on **Enter**).
+4. When submitted, we compute letter statuses (green/yellow/grey) using the classic two‑pass algorithm and push the result to `guesses`.
+5. After submission we reset `draft`, move to the next row, and refocus the hidden input.
+6. The UI simply maps over `guesses` (or the draft for the active row) and renders tiles with appropriate background colors.
+
+## Contributing
+
+Feel free to open issues or submit pull requests. Please follow the existing code style and add tests for new logic.
+
+## License
+
+This project is open source and available under the [MIT License](LICENSE).
+
