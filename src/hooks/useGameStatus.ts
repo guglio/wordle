@@ -29,7 +29,8 @@ const setInitState = (solution: string) => {
 };
 
 export const useWordleGame = (solution = "CRANE") => {
-  solution = WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)];
+  solution =
+    solution || WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)];
   const [gameState, setGameState] = useState<GameState>(setInitState(solution));
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -68,11 +69,17 @@ export const useWordleGame = (solution = "CRANE") => {
   );
   const handleKey = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
-      console.log(e.key);
       if (gameState.gameOver) return;
+
+      if (e.altKey || e.ctrlKey || e.metaKey) return;
 
       const key = e.key;
 
+      // -------- navigation keys (prevent scroll) --------
+      if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(key)) {
+        e.preventDefault();
+        return;
+      }
       if (key === "Backspace") {
         e.preventDefault();
         if (gameState.draft.length > 0) {
@@ -90,15 +97,6 @@ export const useWordleGame = (solution = "CRANE") => {
         if (gameState.draft.length !== WORD_LENGTH) return;
 
         const statuses = evaluateGuess(gameState.draft);
-        const newGuess: GuessType = {
-          letters: gameState.draft
-            .toUpperCase()
-            .split("")
-            .map((char, i) => ({
-              letter: char,
-              status: statuses[i],
-            })),
-        };
 
         setGameState((prev) => {
           const updatedGuesses = [...prev.guesses];
@@ -184,6 +182,27 @@ export const useWordleGame = (solution = "CRANE") => {
     },
     [gameState.currentRow, gameState.draft, gameState.guesses],
   );
-  console.log(gameState);
-  return { gameState, getInputProps, getRowLetters };
+
+  const getCurrentGuess = useCallback((): GuessLetter[] => {
+    const typed = gameState.draft
+      .toUpperCase()
+      .split("")
+      .map((letter) => ({
+        letter,
+        status: "EMPTY" as LetterStatus,
+      }));
+    const padding = Array(WORD_LENGTH - gameState.draft.length).fill(
+      EMPTY_LETTER,
+    );
+    return [...typed, ...padding];
+  }, [gameState.draft, gameState.currentCol]);
+
+  return {
+    ...gameState,
+    solution,
+    evaluateGuess,
+    getInputProps,
+    getRowLetters,
+    getCurrentGuess,
+  };
 };
