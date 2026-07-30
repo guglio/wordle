@@ -122,7 +122,11 @@ export const useWordleGame = (solution = "CRANE") => {
         });
         return;
       }
-      if (/^[a-zA-Z]/.test(key) && gameState.draft.length < WORD_LENGTH) {
+      if (
+        key.length === 1 &&
+        /^[a-zA-Z]/.test(key) &&
+        gameState.draft.length < WORD_LENGTH
+      ) {
         e.preventDefault();
 
         setGameState((state) => ({

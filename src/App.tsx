@@ -13,7 +13,6 @@ function App() {
     getCurrentGuess,
   } = useWordleGame("CRANE");
 
-  console.log(draft, solution);
   return (
     <div className="app">
       <header>
