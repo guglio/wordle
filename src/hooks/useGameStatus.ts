@@ -1,8 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type {
-  KeyboardEvent,
-  FocusEvent,
-} from 'react';
+import type { KeyboardEvent, FocusEvent } from 'react';
 
 export type LetterStatus = 'GREEN' | 'YELLOW' | 'GREY' | 'EMPTY';
 
@@ -17,6 +14,15 @@ export interface GuessType {
 
 export type Guesses = GuessType[];
 
+export interface GameState {
+  guesses: GuessType[];
+  currentRow: number;
+  currentCol: number;
+  draft: string;
+  solution: string;
+  gameOver: boolean;
+}
+
 const WORD_LENGTH = 5;
 const MAX_GUESSES = 6;
 
@@ -27,7 +33,7 @@ const WORD_LIST: string[] = [
   'TRACE',
   'ROAST',
   'SAUCE',
-  // …add as many 5‑letter words as you like…;
+  // …add as many 5‑letter words as you like…
 ];
 
 const EMPTY_LETTER = { letter: '', status: 'EMPTY' as LetterStatus };
@@ -100,7 +106,7 @@ export const useWordleGame = (solution = 'CRANE') => {
    *  Keyboard handling
    *  -------------------------------------------------------------- */
   const handleKey = useCallback(
-    (e: React.KeyboardEvent<HTMLInputElement>) => {
+    (e: KeyboardEvent<HTMLInputElement>) => {
       if (gameState.gameOver) return;
 
       // Ignore modifier‑key combos (copy/paste, etc.)
@@ -109,7 +115,9 @@ export const useWordleGame = (solution = 'CRANE') => {
       const key = e.key;
 
       // -------- navigation keys (prevent scroll) --------
-      if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(key)) {
+      if (
+        ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(key)
+      ) {
         e.preventDefault();
         return;
       }
@@ -209,25 +217,31 @@ export const useWordleGame = (solution = 'CRANE') => {
    *  -------------------------------------------------------------- */
   const getRowLetters = useCallback(
     (rowIndex: number): GuessLetter[] => {
-      if (rowIndex < gameState.guesses.length) {
-        return gameState.guesses[rowIndex].letters;
-      }
-      if (rowIndex === gameState.currentRow) {
+      // If this is the current row and we have a draft being typed, show the draft.
+      if (
+        rowIndex === gameState.currentRow &&
+        gameState.draft.length > 0
+      ) {
         const draftLetters = gameState.draft
           .toUpperCase()
           .split('')
-          .map(ch => ({ letter: ch, status: 'EMPTY' as LetterStatus }));
+          .map((ch) => ({
+            letter: ch,
+            status: 'EMPTY' as LetterStatus,
+          }));
         const padding = Array(WORD_LENGTH - gameState.draft.length).fill({
           letter: '',
           status: 'EMPTY' as LetterStatus,
         });
         return [...draftLetters, ...padding];
       }
-      // Future rows are completely empty
-      return Array(WORD_LENGTH).fill({
-        letter: '',
-        status: 'EMPTY' as LetterStatus,
-      });
+      // Otherwise show the committed guess (or empty row for future attempts).
+      if (rowIndex < gameState.guesses.length) {
+        return gameState.guesses[rowIndex].letters;
+      }
+      // Should never happen because guesses.length === MAX_GUESSES,
+      // but keep as fallback.
+      return Array(WORD_LENGTH).fill(EMPTY_LETTER);
     },
     [gameState.currentRow, gameState.draft, gameState.guesses]
   );
@@ -242,7 +256,7 @@ export const useWordleGame = (solution = 'CRANE') => {
       }));
     const padding = Array(WORD_LENGTH - gameState.draft.length).fill(EMPTY_LETTER);
     return [...typed, ...padding];
-  }, [gameState.draft, gameState.currentCol]);
+  }, [gameState.draft]);
 
   return {
     ...gameState,

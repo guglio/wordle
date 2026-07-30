@@ -7,10 +7,9 @@ function App() {
     draft,
     solution,
     guesses,
-    currentRow,
     gameOver,
     getInputProps,
-    getCurrentGuess,
+    getRowLetters,
   } = useWordleGame("CRANE");
 
   return (
@@ -25,11 +24,8 @@ function App() {
       </header>
       <main>
         <div className="board">
-          {guesses.map((row, idx) => (
-            <GuessRow
-              key={idx}
-              letters={idx === currentRow ? getCurrentGuess() : row.letters}
-            />
+          {guesses.map((_, idx) => (
+            <GuessRow key={idx} letters={getRowLetters(idx)} />
           ))}
         </div>
       </main>
