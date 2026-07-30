@@ -111,92 +111,97 @@ export function useWordleGame(predefinedSolution?: string) {
    *  Keyboard handling
    * -------------------------------------------------------------- */
   const handleKey = useCallback(
-    (e: KeyboardEvent<HTMLInputElement>) => {
-      if (gameState.gameOver) return;
+      (e: KeyboardEvent<HTMLInputElement>) => {
+        if (gameState.gameOver) return;
 
-      // Ignore modifier‑key combos (copy/paste, etc.)
-      if (e.altKey || e.ctrlKey || e.metaKey) return;
+        // Ignore modifier‑key combos (copy/paste, etc.)
+        if (e.altKey || e.ctrlKey || e.metaKey) return;
 
-      const key = e.key;
+        const key = e.key;
 
-      // -------- navigation keys (prevent scroll) --------
-      if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(key)) {
-        e.preventDefault();
-        return;
-      }
-
-      // -------- Backspace --------
-      if (key === 'Backspace') {
-        e.preventDefault();
-        if (gameState.draft.length > 0) {
-          setGameState(s => ({
-            ...s,
-            draft: s.draft.slice(0, -1),
-            currentCol: Math.max(0, s.currentCol - 1),
-          }));
-        }
-        return;
-      }
-
-      // -------- Enter --------
-      if (key === 'Enter') {
-        e.preventDefault();
-        if (gameState.draft.length !== WORD_LENGTH) return;
-
-        const isValidWord = WORD_LIST.includes(gameState.draft);
-        if (!isValidWord) {
-          // Optional: trigger a “shake” animation or show a toast.
+        // -------- navigation keys (prevent scroll) --------
+        if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(key)) {
+          e.preventDefault();
           return;
         }
 
-        const statuses = evaluateGuess(gameState.draft.toUpperCase());
-        const newGuess: GuessType = {
-          letters: gameState.draft
-            .toUpperCase()
-            .split('')
-            .map((ch, i) => ({
-              letter: ch,
-              status: statuses[i],
-            })),
-        };
+        // -------- Backspace --------
+        if (key === 'Backspace') {
+          e.preventDefault();
+          if (gameState.draft.length > 0) {
+            setGameState(s => ({
+              ...s,
+              draft: s.draft.slice(0, -1),
+              currentCol: Math.max(0, s.currentCol - 1),
+            }));
+          }
+          return;
+        }
 
-        setGameState(s => {
-          const newGuesses = [...s.guesses, newGuess];
-          const isWin = statuses.every(st => st === 'GREEN');
-          const nextRow = s.currentRow + 1;
-          const gameOver = isWin || nextRow >= MAX_GUESSES;
+        // -------- Enter --------
+        if (key === 'Enter') {
+          e.preventDefault();
+          if (gameState.draft.length !== WORD_LENGTH) return;
 
-          return {
-            ...s,
-            guesses: newGuesses,
-            currentRow: gameOver ? s.currentRow : nextRow,
-            currentCol: 0,
-            draft: '',
-            gameOver,
+          const isValidWord = WORD_LIST.includes(gameState.draft);
+          if (!isValidWord) {
+            // Optional: trigger a “shake” animation or show a toast.
+            return;
+          }
+
+          const statuses = evaluateGuess(gameState.draft.toUpperCase());
+          const newGuess: GuessType = {
+            letters: gameState.draft
+              .toUpperCase()
+              .split('')
+              .map((ch, i) => ({
+                letter: ch,
+                status: statuses[i],
+              })),
           };
-        });
-        return;
-      }
 
-      // -------- Letter keys --------
-      if (/^[a-zA-Z]$/.test(key) && gameState.draft.length < WORD_LENGTH) {
+          setGameState(s => {
+            const newGuesses = [...s.guesses, newGuess];
+            const isWin = statuses.every(st => st === 'GREEN');
+            const nextRow = s.currentRow + 1;
+            const gameOver = isWin || nextRow >= MAX_GUESSES;
+
+            return {
+              ...s,
+              guesses: newGuesses,
+              currentRow: gameOver ? s.currentRow : nextRow,
+              currentCol: 0,
+              draft: '',
+              gameOver,
+            };
+          });
+          return;
+        }
+
+        // -------- Letter keys --------
+        if (/^[a-zA-Z]$/.test(key) && gameState.draft.length < WORD_LENGTH) {
+          e.preventDefault();
+          setGameState(s => ({
+            ...s,
+            draft: s.draft + key.toUpperCase(),
+            currentCol: Math.min(WORD_LENGTH, s.currentCol + 1),
+          }));
+          return;
+        }
+
+        // -------- Any other key (Tab, Shift, Escape, Space, etc.) --------
+        // Prevent default to avoid scrolling or focus loss, but otherwise ignore.
         e.preventDefault();
-        setGameState(s => ({
-          ...s,
-          draft: s.draft + key.toUpperCase(),
-          currentCol: Math.min(WORD_LENGTH, s.currentCol + 1),
-        }));
-      }
-    },
-    [
-      gameState.currentCol,
-      gameState.currentRow,
-      gameState.draft,
-      gameState.gameOver,
-      evaluateGuess,
-    ]
-  );
-
+        return;
+      },
+      [
+        gameState.currentCol,
+        gameState.currentRow,
+        gameState.draft,
+        gameState.gameOver,
+        evaluateGuess,
+      ]
+    );
   /* --------------------------------------------------------------
    *  Props for the hidden input
    * -------------------------------------------------------------- */
