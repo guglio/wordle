@@ -1,32 +1,40 @@
-import { GuessRow } from './Components/GuessRow/GuessRow';
-import './App.css';
-import { useWordleGame } from './hooks/useGameStatus';
+import { GuessRow } from "./Components/GuessRow/GuessRow";
+import { useWordleGame } from "./hooks/useGameStatus";
+import "./App.css";
 
 function App() {
-  // Pass a fixed word for testing, or omit for random.
-  const { gameState, getInputProps, getRowLetters } = useWordleGame(); // or useWordleGame('CRANE')
+  const {
+    draft,
+    solution,
+    guesses,
+    currentRow,
+    gameOver,
+    getInputProps,
+    getCurrentGuess,
+  } = useWordleGame("CRANE");
 
   return (
-    <>
-      <h2>Wordle</h2>
-      <div className="app">
-        <div className="guesses">
-          {gameState.guesses.map((guess, idx) => (
-            <GuessRow key={idx} letters={guess.letters} />
-          ))}
-          {/* Render the current (in‑progress) row if the game isn't over */}
-          {!gameState.gameOver && (
+    <div className="app">
+      <header>
+        <h1>Wordle</h1>
+        {gameOver && (
+          <p className="message">
+            {draft === solution ? "🎉 You win!" : ` Word was ${solution}`}
+          </p>
+        )}
+      </header>
+      <main>
+        <div className="board">
+          {guesses.map((row, idx) => (
             <GuessRow
-              key="current"
-              letters={getRowLetters(gameState.currentRow)}
+              key={idx}
+              letters={idx === currentRow ? getCurrentGuess() : row.letters}
             />
-          )}
+          ))}
         </div>
-      </div>
-
-      {/* Hidden input that captures keyboard events */}
+      </main>
       <input {...getInputProps()} autoComplete="off" />
-    </>
+    </div>
   );
 }
 

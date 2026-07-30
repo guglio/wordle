@@ -18,5 +18,11 @@ export default defineConfig([
     languageOptions: {
       globals: globals.browser,
     },
+    rules: {
+      // Enforce single quotes for strings
+      quotes: ['error', 'single', { avoidEscape: true, allowTemplateLiterals: true }],
+      // Optional: enforce single quotes in JSX attributes
+      // jsx-quotes: ['error', 'prefer-single'],
+    },
   },
 ])
