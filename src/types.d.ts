@@ -1,18 +1,18 @@
-type LetterStatus = "GREEN" | "YELLOW" | "GREY" | "EMPTY";
+export type LetterStatus = "GREEN" | "YELLOW" | "GREY" | "EMPTY";
 
-interface GuessLetter {
+export interface GuessLetter {
   letter: string; // the actual letter
   status: LetterStatus;
 }
 
-interface GuessType {
+export interface GuessType {
   letters: GuessLetter[]; // length === 5
 }
 
 /* The board state */
-type Guesses = GuessType[]; // grows as the user submits guesses
+export type Guesses = GuessType[]; // grows as the user submits guesses
 
-interface GameState {
+export interface GameState {
   guesses: Guesses; // committed rows
   currentRow: number; // which row we are filling (0‑based)
   currentCol: number; // next column to fill in the current row (0‑5)
