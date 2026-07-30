@@ -31,8 +31,11 @@ const WORD_LIST: string[] = [
 ];
 
 function useInitState(solution: string) {
+  const emptyRow: GuessType = {
+    letters: Array(WORD_LENGTH).fill({ letter: '', status: 'EMPTY' as LetterStatus }),
+  };
   return {
-    guesses: [],
+    guesses: Array(MAX_GUESSES).fill(emptyRow), // pre‑filled board
     solution,
     currentRow: 0,
     currentCol: 0,
@@ -145,31 +148,34 @@ export function useWordleGame(predefinedSolution?: string) {
 
         const isValidWord = WORD_LIST.includes(gameState.draft);
         if (!isValidWord) {
-          // Optional: trigger a “shake” animation or show a toast.
+          // Optional: shake row or show "not in word list" feedback.
           return;
         }
 
-        const statuses = evaluateGuess(gameState.draft.toUpperCase());
+        const statuses = evaluateGuess(gameState.draft);
         const newGuess: GuessType = {
           letters: gameState.draft
-            .toUpperCase()
             .split('')
             .map((ch, i) => ({
-              letter: ch,
+              letter: ch.toUpperCase(),
               status: statuses[i],
             })),
         };
 
-        setGameState(s => {
-          const newGuesses = [...s.guesses, newGuess];
-          const isWin = statuses.every(st => st === 'GREEN');
-          const nextRow = s.currentRow + 1;
-          const gameOver = isWin || nextRow >= MAX_GUESSES;
+        setGameState(prev => {
+          const updatedGuesses = [...prev.guesses];
+          // replace the current row with the completed guess
+          updatedGuesses[prev.currentRow] = newGuess;
+
+          const isWinner = prev.draft.toLowerCase() === prev.solution.toLowerCase();
+          const nextRow = prev.currentRow + 1;
+          const gameOver = isWinner || nextRow >= MAX_GUESSES;
 
           return {
-            ...s,
-            guesses: newGuesses,
-            currentRow: gameOver ? s.currentRow : nextRow,
+            ...prev,
+            guesses: updatedGuesses,
+            solution: prev.solution,
+            currentRow: gameOver ? prev.currentRow : nextRow,
             currentCol: 0,
             draft: '',
             gameOver,
@@ -181,24 +187,26 @@ export function useWordleGame(predefinedSolution?: string) {
       // -------- Letter keys --------
       if (/^[a-zA-Z]$/.test(key) && gameState.draft.length < WORD_LENGTH) {
         e.preventDefault();
-        setGameState(s => ({
-          ...s,
-          draft: s.draft + key.toUpperCase(),
-          currentCol: Math.min(WORD_LENGTH, s.currentCol + 1),
+        setGameState(prev => ({
+          ...prev,
+          draft: prev.draft + key.toUpperCase(),
+          currentCol: Math.min(WORD_LENGTH, prev.currentCol + 1),
         }));
+        return;
       }
     },
     [
+      evaluateGuess,
       gameState.currentCol,
-      gameState.currentRow,
       gameState.draft,
       gameState.gameOver,
-      evaluateGuess,
+      WORD_LENGTH,
+      WORD_LIST,
     ]
   );
 
   /* --------------------------------------------------------------
-   *  Props for the hidden input
+   *  Helper to get the props for the hidden input
    * -------------------------------------------------------------- */
   const getInputProps = useCallback(() => ({
     ref: inputRef,
@@ -214,35 +222,34 @@ export function useWordleGame(predefinedSolution?: string) {
   }), [handleKey, handleInputBlur]);
 
   /* --------------------------------------------------------------
-   *  Derive what to render for a given row (committed or draft)
+   *  Expose useful derived values
    * -------------------------------------------------------------- */
   const getRowLetters = useCallback(
     (rowIndex: number): GuessLetter[] => {
       if (rowIndex < gameState.guesses.length) {
-        return gameState.guesses[rowIndex].letters;
-      }
-      if (rowIndex === gameState.currentRow) {
-        const draftLetters = gameState.draft
+        // For rows that are not the current editing row, show the stored guess.
+        if (rowIndex !== gameState.currentRow) {
+          return gameState.guesses[rowIndex].letters;
+        }
+        // Current row – show the draft letters (what the user is typing).
+        const typed = gameState.draft
           .toUpperCase()
           .split('')
           .map(ch => ({ letter: ch, status: 'EMPTY' as LetterStatus }));
-        const padding = Array(WORD_LENGTH - gameState.draft.length).fill({
-          letter: '',
-          status: 'EMPTY' as LetterStatus,
-        });
-        return [...draftLetters, ...padding];
+        const padding = Array(WORD_LENGTH - gameState.draft.length)
+          .fill({ letter: '', status: 'EMPTY' as LetterStatus });
+        return [...typed, ...padding];
       }
-      // Future rows are completely empty
-      return Array(WORD_LENGTH).fill({
-        letter: '',
-        status: 'EMPTY' as LetterStatus,
-      });
+      // Future rows (should never happen because we pre‑filled the array)
+      return Array(WORD_LENGTH).fill({ letter: '', status: 'EMPTY' });
     },
     [gameState.currentRow, gameState.draft, gameState.guesses]
   );
 
   return {
-    gameState,
+    ...gameState,
+    solution,
+    evaluateGuess,
     getInputProps,
     getRowLetters,
   };

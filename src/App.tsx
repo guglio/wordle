@@ -1,32 +1,48 @@
-import { GuessRow } from './Components/GuessRow/GuessRow';
+import Guess from './Components/Guess';
 import './App.css';
 import { useWordleGame } from './hooks/useGameStatus';
 
 function App() {
-  // Pass a fixed word for testing, or omit for random.
-  const { gameState, getInputProps, getRowLetters } = useWordleGame(); // or useWordleGame('CRANE')
+  const {
+    guesses,
+    gameOver,
+    getInputProps,
+    getRowLetters,
+  } = useWordleGame(); // optionally pass a solution for testing, e.g., useWordleGame('CRANE')
+
+  // Determine win/lose message when game is over
+  let message = '';
+  if (gameOver) {
+    const lastGuessedRow = [...guesses]
+      .reverse()
+      .find(r => r.letters.some(l => l.letter !== ''));
+    const isWin =
+      !!lastGuessedRow && lastGuessedRow.letters.every(l => l.status === 'GREEN');
+    message = !lastGuessedRow
+      ? ''
+      : isWin
+      ? '🎉 You win!'
+      : `😢 Word was ${lastGuessedRow.letters.map(l => l.letter).join('')}`;
+  }
 
   return (
-    <>
-      <h2>Wordle</h2>
-      <div className="app">
-        <div className="guesses">
-          {gameState.guesses.map((guess, idx) => (
-            <GuessRow key={idx} letters={guess.letters} />
+    <div className="app">
+      <header>
+        <h1>Wordle</h1>
+        {gameOver && <p className="message">{message}</p>}
+      </header>
+
+      <main>
+        <div className="board">
+          {guesses.map((_, idx) => (
+            <Guess key={idx} letters={getRowLetters(idx)} />
           ))}
-          {/* Render the current (in‑progress) row if the game isn't over */}
-          {!gameState.gameOver && (
-            <GuessRow
-              key="current"
-              letters={getRowLetters(gameState.currentRow)}
-            />
-          )}
         </div>
-      </div>
+      </main>
 
       {/* Hidden input that captures keyboard events */}
       <input {...getInputProps()} autoComplete="off" />
-    </>
+    </div>
   );
 }
 
