@@ -11,14 +11,22 @@ const WORD_LIST = [
   // … add more 5‑letter words …
 ];
 
-const setInitState = (solution: string) => ({
-  guesses: [],
-  currentRow: 0,
-  currentCol: 0,
-  draft: "",
-  solution,
-  gameOver: false,
-});
+const EMPTY_LETTER = { letter: "", status: "EMPTY" as LetterStatus };
+
+const EMPTY_ROW: GuessType = {
+  letters: Array(WORD_LENGTH).fill(EMPTY_LETTER),
+};
+
+const setInitState = (solution: string) => {
+  return {
+    guesses: Array(MAX_GUESSES).fill(EMPTY_ROW),
+    currentRow: 0,
+    currentCol: 0,
+    draft: "",
+    solution,
+    gameOver: false,
+  };
+};
 
 export const useWordleGame = (solution = "CRANE") => {
   solution = WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)];
@@ -37,17 +45,17 @@ export const useWordleGame = (solution = "CRANE") => {
 
       const status: LetterStatus[] = Array(WORD_LENGTH).fill("GREY");
 
-      guessChars.forEach((ch, i) => {
-        if (ch === solutionChars[i]) {
+      guessChars.forEach((letter, i) => {
+        if (letter === solutionChars[i]) {
           status[i] = "GREEN";
           solutionChars[i] = null as any;
           guessChars[i] = null as any;
         }
       });
 
-      guessChars.forEach((ch, i) => {
-        if (ch === null) return;
-        const idx = solutionChars.indexOf(ch);
+      guessChars.forEach((letter, i) => {
+        if (letter === null) return;
+        const idx = solutionChars.indexOf(letter);
         if (idx !== -1) {
           status[i] = "YELLOW";
           solutionChars[idx] = null as any;
@@ -80,7 +88,7 @@ export const useWordleGame = (solution = "CRANE") => {
       if (key === "Enter") {
         e.preventDefault();
         if (gameState.draft.length !== WORD_LENGTH) return;
-        // if()
+
         const statuses = evaluateGuess(gameState.draft);
         const newGuess: GuessType = {
           letters: gameState.draft
@@ -92,16 +100,23 @@ export const useWordleGame = (solution = "CRANE") => {
             })),
         };
 
-        setGameState((state) => {
-          const newGuesses = [...state.guesses, newGuess];
-          const isWin = statuses.every((status) => status === "GREEN");
-          const nextRow = state.currentRow + 1;
-          const gameOver = isWin || nextRow >= MAX_GUESSES;
+        setGameState((prev) => {
+          const updatedGuesses = [...prev.guesses];
+          updatedGuesses[prev.currentRow] = {
+            letters: prev.draft.split("").map((char, i) => ({
+              letter: char,
+              status: statuses[i],
+            })),
+          };
+
+          const isWinner = statuses.every((status) => status === "GREEN");
+          const nextRow = prev.currentRow + 1;
+          const gameOver = isWinner || nextRow >= MAX_GUESSES;
 
           return {
-            ...state,
-            guesses: newGuesses,
-            currentRow: gameOver ? state.currentRow : nextRow,
+            ...prev,
+            guesses: updatedGuesses,
+            currentRow: gameOver ? prev.currentRow : nextRow,
             currentCol: 0,
             draft: "",
             gameOver,
@@ -154,7 +169,7 @@ export const useWordleGame = (solution = "CRANE") => {
         return gameState.draft
           .toUpperCase()
           .split("")
-          .map((char, i) => ({ letter: char, status: "EMPTY" as LetterStatus }))
+          .map((char) => ({ letter: char, status: "EMPTY" as LetterStatus }))
           .concat(
             Array(WORD_LENGTH - gameState.draft.length).fill({
               letter: "",
@@ -169,6 +184,6 @@ export const useWordleGame = (solution = "CRANE") => {
     },
     [gameState.currentRow, gameState.draft, gameState.guesses],
   );
-
+  console.log(gameState);
   return { gameState, getInputProps, getRowLetters };
 };
