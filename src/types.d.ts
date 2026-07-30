@@ -1,4 +1,4 @@
-type LetterStatus = "GREEN" | "YELLOW" | "GREY" | "EMPTY";
+type LetterStatus = 'GREEN' | 'YELLOW' | 'GREY' | 'EMPTY';
 
 interface GuessLetter {
   letter: string; // the actual letter

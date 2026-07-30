@@ -1,17 +1,17 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 
 const WORD_LENGTH = 5;
 const MAX_GUESSES = 6;
 
 const WORD_LIST = [
-  "SLATE",
-  "CRANE",
-  "TRACE",
-  "ROAST",
+  'SLATE',
+  'CRANE',
+  'TRACE',
+  'ROAST',
   // … add more 5‑letter words …
 ];
 
-const EMPTY_LETTER = { letter: "", status: "EMPTY" as LetterStatus };
+const EMPTY_LETTER = { letter: '', status: 'EMPTY' as LetterStatus };
 
 const EMPTY_ROW: GuessType = {
   letters: Array(WORD_LENGTH).fill(EMPTY_LETTER),
@@ -22,13 +22,13 @@ const setInitState = (solution: string) => {
     guesses: Array(MAX_GUESSES).fill(EMPTY_ROW),
     currentRow: 0,
     currentCol: 0,
-    draft: "",
+    draft: '',
     solution,
     gameOver: false,
   };
 };
 
-export const useWordleGame = (solution = "CRANE") => {
+export const useWordleGame = (solution = 'CRANE') => {
   solution =
     solution || WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)];
   const [gameState, setGameState] = useState<GameState>(setInitState(solution));
@@ -41,14 +41,14 @@ export const useWordleGame = (solution = "CRANE") => {
 
   const evaluateGuess = useCallback(
     (guessWord: string) => {
-      const solutionChars = gameState.solution.split("");
-      const guessChars = guessWord.split("");
+      const solutionChars = gameState.solution.split('');
+      const guessChars = guessWord.split('');
 
-      const status: LetterStatus[] = Array(WORD_LENGTH).fill("GREY");
+      const status: LetterStatus[] = Array(WORD_LENGTH).fill('GREY');
 
       guessChars.forEach((letter, i) => {
         if (letter === solutionChars[i]) {
-          status[i] = "GREEN";
+          status[i] = 'GREEN';
           solutionChars[i] = null as any;
           guessChars[i] = null as any;
         }
@@ -58,7 +58,7 @@ export const useWordleGame = (solution = "CRANE") => {
         if (letter === null) return;
         const idx = solutionChars.indexOf(letter);
         if (idx !== -1) {
-          status[i] = "YELLOW";
+          status[i] = 'YELLOW';
           solutionChars[idx] = null as any;
         }
       });
@@ -76,11 +76,11 @@ export const useWordleGame = (solution = "CRANE") => {
       const key = e.key;
 
       // -------- navigation keys (prevent scroll) --------
-      if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(key)) {
+      if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(key)) {
         e.preventDefault();
         return;
       }
-      if (key === "Backspace") {
+      if (key === 'Backspace') {
         e.preventDefault();
         if (gameState.draft.length > 0) {
           setGameState((s) => ({
@@ -92,7 +92,7 @@ export const useWordleGame = (solution = "CRANE") => {
         return;
       }
 
-      if (key === "Enter") {
+      if (key === 'Enter') {
         e.preventDefault();
         if (gameState.draft.length !== WORD_LENGTH) return;
 
@@ -101,13 +101,13 @@ export const useWordleGame = (solution = "CRANE") => {
         setGameState((prev) => {
           const updatedGuesses = [...prev.guesses];
           updatedGuesses[prev.currentRow] = {
-            letters: prev.draft.split("").map((char, i) => ({
+            letters: prev.draft.split('').map((char, i) => ({
               letter: char,
               status: statuses[i],
             })),
           };
 
-          const isWinner = statuses.every((status) => status === "GREEN");
+          const isWinner = statuses.every((status) => status === 'GREEN');
           const nextRow = prev.currentRow + 1;
           const gameOver = isWinner || nextRow >= MAX_GUESSES;
 
@@ -116,7 +116,7 @@ export const useWordleGame = (solution = "CRANE") => {
             guesses: updatedGuesses,
             currentRow: gameOver ? prev.currentRow : nextRow,
             currentCol: 0,
-            draft: "",
+            draft: '',
             gameOver,
           };
         });
@@ -154,11 +154,11 @@ export const useWordleGame = (solution = "CRANE") => {
       onKeyDown: handleKey,
       onBlur: handleInputBlur,
       style: {
-        position: "absolute",
-        left: "-9999px",
+        position: 'absolute',
+        left: '-9999px',
         opacity: 0,
       } as const,
-      "aria-label": "Wordle guess input",
+      'aria-label': 'Wordle guess input',
     }),
     [handleKey],
   );
@@ -170,18 +170,18 @@ export const useWordleGame = (solution = "CRANE") => {
       if (rowIndex === gameState.currentRow) {
         return gameState.draft
           .toUpperCase()
-          .split("")
-          .map((char) => ({ letter: char, status: "EMPTY" as LetterStatus }))
+          .split('')
+          .map((char) => ({ letter: char, status: 'EMPTY' as LetterStatus }))
           .concat(
             Array(WORD_LENGTH - gameState.draft.length).fill({
-              letter: "",
-              status: "EMPTY" as LetterStatus,
+              letter: '',
+              status: 'EMPTY' as LetterStatus,
             }),
           );
       }
       return Array(WORD_LENGTH).fill({
-        letter: "",
-        status: "EMPTY" as LetterStatus,
+        letter: '',
+        status: 'EMPTY' as LetterStatus,
       });
     },
     [gameState.currentRow, gameState.draft, gameState.guesses],
@@ -190,10 +190,10 @@ export const useWordleGame = (solution = "CRANE") => {
   const getCurrentGuess = useCallback((): GuessLetter[] => {
     const typed = gameState.draft
       .toUpperCase()
-      .split("")
+      .split('')
       .map((letter) => ({
         letter,
-        status: "EMPTY" as LetterStatus,
+        status: 'EMPTY' as LetterStatus,
       }));
     const padding = Array(WORD_LENGTH - gameState.draft.length).fill(
       EMPTY_LETTER,

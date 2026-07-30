@@ -1,4 +1,4 @@
-import "./guessRow.css";
+import './guessRow.css';
 
 const LetterTile = ({ letter, status }: GuessLetter) => {
   return <span className={`letter ${status.toLowerCase()}`}>{letter}</span>;

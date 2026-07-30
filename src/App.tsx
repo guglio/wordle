@@ -1,6 +1,6 @@
-import { GuessRow } from "./Components/GuessRow/GuessRow";
-import { useWordleGame } from "./hooks/useGameStatus";
-import "./App.css";
+import { GuessRow } from './Components/GuessRow/GuessRow';
+import { useWordleGame } from './hooks/useGameStatus';
+import './App.css';
 
 function App() {
   const {
@@ -11,7 +11,7 @@ function App() {
     gameOver,
     getInputProps,
     getCurrentGuess,
-  } = useWordleGame("CRANE");
+  } = useWordleGame('CRANE');
 
   return (
     <div className="app">
@@ -19,7 +19,7 @@ function App() {
         <h1>Wordle</h1>
         {gameOver && (
           <p className="message">
-            {draft === solution ? "🎉 You win!" : `😢 Word was ${solution}`}
+            {draft === solution ? '🎉 You win!' : `😢 Word was ${solution}`}
           </p>
         )}
       </header>
