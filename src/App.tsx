@@ -4,27 +4,27 @@ import './App.css';
 
 function App() {
   const {
-    draft,
     solution,
     guesses,
     currentRow,
     gameOver,
     getInputProps,
     getCurrentGuess,
+    isWinner,
   } = useWordleGame('CRANE');
 
   return (
-    <div className="app">
+    <div className='app'>
       <header>
         <h1>Wordle</h1>
         {gameOver && (
-          <p className="message">
-            {draft === solution ? '🎉 You win!' : `😢 Word was ${solution}`}
+          <p className='message'>
+            {isWinner ? '🎉 You win!' : `😢 Word was ${solution}`}
           </p>
         )}
       </header>
       <main>
-        <div className="board">
+        <div className='board'>
           {guesses.map((row, idx) => (
             <GuessRow
               key={idx}
@@ -33,7 +33,7 @@ function App() {
           ))}
         </div>
       </main>
-      <input {...getInputProps()} autoComplete="off" />
+      <input {...getInputProps()} autoComplete='off' />
     </div>
   );
 }

@@ -25,6 +25,7 @@ const setInitState = (solution: string) => {
     draft: '',
     solution,
     gameOver: false,
+    isWinner: false,
   };
 };
 
@@ -67,6 +68,7 @@ export const useWordleGame = (solution = 'CRANE') => {
     },
     [gameState.solution],
   );
+
   const handleKey = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (gameState.gameOver) return;
@@ -108,8 +110,8 @@ export const useWordleGame = (solution = 'CRANE') => {
           };
 
           const isWinner = statuses.every((status) => status === 'GREEN');
-          const nextRow = prev.currentRow + 1;
-          const gameOver = isWinner || nextRow >= MAX_GUESSES;
+          const gameOver = isWinner || prev.currentRow + 1 >= MAX_GUESSES;
+          const nextRow = gameOver ? prev.currentRow : prev.currentRow + 1;
 
           return {
             ...prev,
@@ -118,6 +120,7 @@ export const useWordleGame = (solution = 'CRANE') => {
             currentCol: 0,
             draft: '',
             gameOver,
+            isWinner,
           };
         });
         return;
@@ -188,18 +191,23 @@ export const useWordleGame = (solution = 'CRANE') => {
   );
 
   const getCurrentGuess = useCallback((): GuessLetter[] => {
-    const typed = gameState.draft
-      .toUpperCase()
-      .split('')
-      .map((letter) => ({
-        letter,
-        status: 'EMPTY' as LetterStatus,
-      }));
-    const padding = Array(WORD_LENGTH - gameState.draft.length).fill(
-      EMPTY_LETTER,
-    );
-    return [...typed, ...padding];
-  }, [gameState.draft, gameState.currentCol]);
+    if (gameState.draft.length > 0) {
+      const typed = gameState.draft
+        .toUpperCase()
+        .split('')
+        .map((letter) => ({
+          letter,
+          status: 'EMPTY' as LetterStatus,
+        }));
+      const padding = Array(WORD_LENGTH - gameState.draft.length).fill(
+        EMPTY_LETTER,
+      );
+      return [...typed, ...padding];
+    }
+    if (gameState.currentRow < gameState.guesses.length)
+      return gameState.guesses[gameState.currentRow].letters;
+    return Array(MAX_GUESSES).fill(EMPTY_ROW);
+  }, [gameState.draft, gameState.currentRow, gameState.guesses]);
 
   return {
     ...gameState,

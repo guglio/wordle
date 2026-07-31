@@ -19,4 +19,5 @@ interface GameState {
   draft: string; // letters typed in the current row (max 5)
   solution: string; // the secret word (for demo; normally hidden)
   gameOver: boolean; // true when solved or max rows reached
+  isWinner: boolean; // true when solved or max rows reached
 }
