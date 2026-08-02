@@ -208,6 +208,10 @@ export const useWordleGame = (solution = 'CRANE') => {
       return gameState.guesses[gameState.currentRow].letters;
     return Array(MAX_GUESSES).fill(EMPTY_ROW);
   }, [gameState.draft, gameState.currentRow, gameState.guesses]);
+  const resetGame = useCallback(() => {
+    const newSolution = WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)];
+    setGameState(setInitState(newSolution));
+  }, []);
 
   return {
     ...gameState,
@@ -216,5 +220,6 @@ export const useWordleGame = (solution = 'CRANE') => {
     getInputProps,
     getRowLetters,
     getCurrentGuess,
+    resetGame,
   };
 };
