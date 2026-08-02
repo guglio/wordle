@@ -11,8 +11,12 @@ export const Modal = ({ isWinner, solution, onClose, onReset }: ModalProps) => {
   const message = isWinner ? '🎉 You win!' : `😢 Word was ${solution}`;
 
   return (
-    <div className='wordle-modal'>
-      <div className='modal-content' onClick={(e) => e.stopPropagation()}>
+    <div className='wordle-modal' onClick={(e) => {
+      if (e.target === e.currentTarget) {
+        onClose();
+      }
+    }}>
+      <div className='modal-content'>
         <div className='modal-header'>
           <h2 className='modal-title'>
             {isWinner ? 'Congratulations!' : 'Game Over'}
