@@ -1,6 +1,8 @@
 import { GuessRow } from './Components/GuessRow/GuessRow';
 import { useWordleGame } from './hooks/useGameStatus';
 import './App.css';
+import { Modal } from './Components/Modal/Modal';
+import { useEffect, useState } from 'react';
 
 function App() {
   const {
@@ -11,16 +13,28 @@ function App() {
     getInputProps,
     getCurrentGuess,
     isWinner,
+    resetGame,
   } = useWordleGame('CRANE');
+
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    if (gameOver) {
+      setShowModal(true);
+    }
+  }, [gameOver]);
 
   return (
     <div className='app'>
       <header>
         <h1>Wordle</h1>
-        {gameOver && (
-          <p className='message'>
-            {isWinner ? '🎉 You win!' : `😢 Word was ${solution}`}
-          </p>
+        {showModal && (
+          <Modal
+            isWinner={isWinner}
+            solution={solution}
+            onClose={() => setShowModal(false)}
+            onReset={resetGame}
+          />
         )}
       </header>
       <main>
