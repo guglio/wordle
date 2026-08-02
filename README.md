@@ -8,6 +8,7 @@ A simple Wordle clone built with **React**, **TypeScript**, and **Vite**.
 - Real‑time letter validation with green/yellow/grey feedback.
 - Random word selection from a built‑in word list.
 - Responsive layout that works on desktop and mobile.
+- Game status modal with title, close (×) button, and "Play Again" reset button.
 - Easy to extend (custom word lists, animations, statistics, etc.).
 
 ## Getting Started
@@ -49,12 +50,24 @@ The optimized output will be in the `dist/` folder.
 npm run preview
 ```
 
+### Testing
+
+Run the test suite with Vitest:
+
+```bash
+# Run tests once
+npm test
+
+# Watch mode (useful during development)
+npm run test:watch
+```
+
 ## Project Structure
 
 ```
 src/
  ├─ components/      # Reusable UI components (GuessRow, LetterTile, etc.)
- ├─ hooks/           # Custom React hooks (useWordleGame)
+ ├─ hooks/           # Custom React hooks (useWordleGame, useGameStatus)
  ├─ types/           # TypeScript type definitions
  ├─ App.tsx          # Root component
  ├─ main.tsx         # Entry point
@@ -73,6 +86,7 @@ src/
 4. When submitted, we compute letter statuses (green/yellow/grey) using the classic two‑pass algorithm and push the result to `guesses`.
 5. After submission we reset `draft`, move to the next row, and refocus the hidden input.
 6. The UI simply maps over `guesses` (or the draft for the active row) and renders tiles with appropriate background colors.
+7. When the game is won or lost, the `useGameStatus` hook opens a modal that displays a title (Congratulations! / Game Over), a close button (×), and a "Play Again" button to reset the game.
 
 ## Contributing
 
@@ -81,4 +95,3 @@ Feel free to open issues or submit pull requests. Please follow the existing cod
 ## License
 
 This project is open source and available under the [MIT License](LICENSE).
-
