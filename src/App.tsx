@@ -17,12 +17,43 @@ function App() {
   } = useWordleGame('CRANE');
 
   const [showModal, setShowModal] = useState(false);
+  const [shareString, setShareString] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (gameOver) {
       setShowModal(true);
+      // Generate share string from guesses (only submitted rows)
+      const rows = guesses
+        .slice(0, currentRow + 1) // only rows that have been submitted
+        .map(row => {
+          return row.letters
+            .map(l => {
+              switch (l.status) {
+                case 'GREEN': return '🟩';
+                case 'YELLOW': return '🟨';
+                default: return '⬜';
+              }
+            })
+            .join('');
+        });
+      const guessCount = rows.length;
+      const header = `Wordle ${guessCount}/6`;
+      const share = [header, ...rows].join('\n');
+      setShareString(share);
     }
-  }, [gameOver]);
+  }, [gameOver, guesses, currentRow]);
+
+  const handleCopyShare = async () => {
+    if (shareString) {
+      try {
+        await navigator.clipboard.writeText(shareString);
+        alert('Copied to clipboard!');
+      } catch (err) {
+        console.error('Failed to copy: ', err);
+        alert('Failed to copy text');
+      }
+    }
+  };
 
   return (
     <div className='app'>
@@ -34,6 +65,8 @@ function App() {
             solution={solution}
             onClose={() => setShowModal(false)}
             onReset={resetGame}
+            shareString={shareString}
+            onCopyShare={handleCopyShare}
           />
         )}
       </header>

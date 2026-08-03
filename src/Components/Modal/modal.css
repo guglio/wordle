@@ -1,25 +1,36 @@
 .wordle-modal {
-  width: 100%;
-  height: 100%;
   position: fixed;
   top: 0;
   left: 0;
-  overflow: auto;
-  background-color: rgba(0, 0, 0, 0.8);
-  z-index: 999;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  z-index: 1000;
 }
 
 .modal-content {
-  background: #fff;
+  background: white;
   border-radius: 8px;
   width: 90%;
   max-width: 400px;
-  text-align: center;
-  position: relative;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .modal-header {
@@ -33,6 +44,7 @@
 .modal-title {
   margin: 0;
   font-size: 1.5rem;
+  font-weight: 600;
   color: #333;
 }
 
@@ -42,8 +54,14 @@
   font-size: 1.5rem;
   line-height: 1;
   cursor: pointer;
-  color: #999;
   padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  transition: color 0.2s;
 }
 
 .modal-close:hover {
@@ -52,31 +70,52 @@
 
 .modal-body {
   padding: 20px;
-  display: flex;
-  gap: 20px;
-  flex-direction: column;
 }
 
 .message {
-  font-size: 1.2rem;
-  color: #555;
+  font-size: 1.25rem;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.share-section {
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.btn-share {
+  background: #538d4e;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-share:hover {
+  background: #3a6b35;
 }
 
 .modal-actions {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
+  gap: 10px;
 }
 
 .btn-reset {
-  background: #538d4e;
-  border: none;
+  background: #818384;
   color: white;
-  padding: 10px 20px;
+  border: none;
   border-radius: 4px;
-  font-size: 1rem;
+  padding: 8px 16px;
+  font-size: 0.9rem;
   cursor: pointer;
+  transition: background 0.2s;
 }
 
 .btn-reset:hover {
-  background: #3a6a35;
+  background: #66686a;
 }
