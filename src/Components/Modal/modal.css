@@ -119,3 +119,15 @@
 .btn-reset:hover {
   background: #66686a;
 }
+
+.share-preview {
+  margin-bottom: 12px;
+  font-family: monospace;
+  white-space: pre-wrap;
+  text-align: center;
+  color: #333;
+  background: #f5f5f5;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px dashed #ccc;
+}

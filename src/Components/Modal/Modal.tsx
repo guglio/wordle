@@ -26,7 +26,10 @@ export const Modal = ({ isWinner, solution, onClose, onReset, shareString, onCop
         <div className='modal-body'>
           <p className='message'>{message}</p>
           {shareString && (
-            <div className='share-section'>
+            <div className='share-preview'>{shareString}</div>
+          )}
+          <div className='modal-actions'>
+            {shareString && (
               <button
                 className='btn-share'
                 onClick={(e) => {
@@ -36,9 +39,7 @@ export const Modal = ({ isWinner, solution, onClose, onReset, shareString, onCop
               >
                 Share
               </button>
-            </div>
-          )}
-          <div className='modal-actions'>
+            )}
             <button
               className='btn-reset'
               onClick={(e) => {

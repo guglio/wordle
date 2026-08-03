@@ -14,6 +14,7 @@ function App() {
     getCurrentGuess,
     isWinner,
     resetGame,
+    getShareString,
   } = useWordleGame('CRANE');
 
   const [showModal, setShowModal] = useState(false);
@@ -22,26 +23,9 @@ function App() {
   useEffect(() => {
     if (gameOver) {
       setShowModal(true);
-      // Generate share string from guesses (only submitted rows)
-      const rows = guesses
-        .slice(0, currentRow + 1) // only rows that have been submitted
-        .map(row => {
-          return row.letters
-            .map(l => {
-              switch (l.status) {
-                case 'GREEN': return '🟩';
-                case 'YELLOW': return '🟨';
-                default: return '⬜';
-              }
-            })
-            .join('');
-        });
-      const guessCount = rows.length;
-      const header = `Wordle ${guessCount}/6`;
-      const share = [header, ...rows].join('\n');
-      setShareString(share);
+      setShareString(getShareString());
     }
-  }, [gameOver, guesses, currentRow]);
+  }, [gameOver, getShareString]);
 
   const handleCopyShare = async () => {
     if (shareString) {

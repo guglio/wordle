@@ -208,10 +208,29 @@ export const useWordleGame = (solution = 'CRANE') => {
       return gameState.guesses[gameState.currentRow].letters;
     return Array(MAX_GUESSES).fill(EMPTY_ROW);
   }, [gameState.draft, gameState.currentRow, gameState.guesses]);
-  const resetGame = useCallback(() => {
+const resetGame = useCallback(() => {
     const newSolution = WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)];
     setGameState(setInitState(newSolution));
   }, []);
+
+  const getShareString = useCallback(() => {
+    const rows = gameState.guesses
+      .slice(0, gameState.currentRow + 1) // only rows that have been submitted
+      .map(row => {
+        return row.letters
+          .map(l => {
+            switch (l.status) {
+              case 'GREEN': return '🟩';
+              case 'YELLOW': return '🟨';
+              default: return '⬜';
+            }
+          })
+          .join('');
+      });
+    const guessCount = rows.length;
+    const header = `Wordle ${guessCount}/6`;
+    return [header, ...rows].join('\n');
+  }, [gameState.guesses, gameState.currentRow]);
 
   return {
     ...gameState,
@@ -221,5 +240,6 @@ export const useWordleGame = (solution = 'CRANE') => {
     getRowLetters,
     getCurrentGuess,
     resetGame,
+    getShareString,
   };
 };
