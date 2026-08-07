@@ -36,4 +36,12 @@ describe('useWordleGame hook', () => {
     expect(result.current.gameOver).toBe(false);
     expect(result.current.isWinner).toBe(false);
   });
+
+  test('getShareString returns a string', () => {
+    const solution = 'TESTS';
+    const { result } = renderHook(() => useWordleGame(solution));
+    const shareString = result.current.getShareString();
+    expect(typeof shareString).toBe('string');
+    expect(shareString.length).toBeGreaterThan(0);
+  });
 });

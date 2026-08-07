@@ -67,4 +67,24 @@ describe('Modal component', () => {
     fireEvent.click(titleEl);
     expect(onClose).not.toHaveBeenCalled();
   });
+
+  test('renders share preview when shareString provided', () => {
+    const shareString = 'test share string';
+    render(<Modal isWinner={true} solution='TEST' onClose={onClose} onReset={onReset} shareString={shareString} />);
+    expect(screen.getByText(shareString)).toBeInTheDocument();
+  });
+
+  test('Share button calls onCopyShare and stops propagation', () => {
+    const onCopyShare = vi.fn();
+    const stopPropagation = vi.fn();
+    const onCopyShareWithStop = (e: React.MouseEvent<HTMLButtonElement>) => {
+      stopPropagation();
+      onCopyShare();
+    };
+    render(<Modal isWinner={true} solution='TEST' onClose={onClose} onReset={onReset} shareString='any string' onCopyShare={onCopyShareWithStop} />);
+    const shareBtn = screen.getByRole('button', { name: /share/i });
+    fireEvent.click(shareBtn);
+    expect(onCopyShare).toHaveBeenCalledTimes(1);
+    expect(stopPropagation).toHaveBeenCalledTimes(1);
+  });
 });
