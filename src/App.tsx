@@ -14,15 +14,30 @@ function App() {
     getCurrentGuess,
     isWinner,
     resetGame,
+    getShareString,
   } = useWordleGame('CRANE');
 
   const [showModal, setShowModal] = useState(false);
+  const [shareString, setShareString] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (gameOver) {
       setShowModal(true);
+      setShareString(getShareString());
     }
-  }, [gameOver]);
+  }, [gameOver, getShareString]);
+
+  const handleCopyShare = async () => {
+    if (shareString) {
+      try {
+        await navigator.clipboard.writeText(shareString);
+        alert('Copied to clipboard!');
+      } catch (err) {
+        console.error('Failed to copy: ', err);
+        alert('Failed to copy text');
+      }
+    }
+  };
 
   return (
     <div className='app'>
@@ -34,6 +49,8 @@ function App() {
             solution={solution}
             onClose={() => setShowModal(false)}
             onReset={resetGame}
+            shareString={shareString}
+            onCopyShare={handleCopyShare}
           />
         )}
       </header>

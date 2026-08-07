@@ -5,9 +5,11 @@ interface ModalProps {
   solution: string;
   onClose: () => void;
   onReset: () => void;
+  shareString?: string;
+  onCopyShare?: () => void;
 }
 
-export const Modal = ({ isWinner, solution, onClose, onReset }: ModalProps) => {
+export const Modal = ({ isWinner, solution, onClose, onReset, shareString, onCopyShare }: ModalProps) => {
   const message = isWinner ? '🎉 You win!' : `😢 Word was ${solution}`;
 
   return (
@@ -27,7 +29,21 @@ export const Modal = ({ isWinner, solution, onClose, onReset }: ModalProps) => {
         </div>
         <div className='modal-body'>
           <p className='message'>{message}</p>
+          {shareString && (
+            <div className='share-preview'>{shareString}</div>
+          )}
           <div className='modal-actions'>
+            {shareString && (
+              <button
+                className='btn-share'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onCopyShare?.();
+                }}
+              >
+                Share
+              </button>
+            )}
             <button
               className='btn-reset'
               onClick={(e) => {
