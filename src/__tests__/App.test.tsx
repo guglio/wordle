@@ -1,9 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import App from './App';
-import { useWordleGame } from './hooks/useGameStatus';
+import App from '../App';
+import { useWordleGame } from '../hooks/useGameStatus';
 
 // Mock the hook using Vitest's vi
-vi.mock('./hooks/useGameStatus');
+vi.mock('../hooks/useGameStatus');
 
 describe('App', () => {
   beforeEach(() => {
@@ -29,7 +29,9 @@ describe('App', () => {
     const { container } = render(<App />);
 
     // Check header
-    expect(screen.getByRole('heading', { name: /wordle/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /wordle/i }),
+    ).toBeInTheDocument();
 
     // Check that there are 6 guess rows
     const guessRows = Array.from(container.querySelectorAll('.guess'));
