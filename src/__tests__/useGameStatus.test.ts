@@ -36,4 +36,14 @@ describe('useWordleGame hook', () => {
     expect(result.current.gameOver).toBe(false);
     expect(result.current.isWinner).toBe(false);
   });
+
+  test('getShareString returns correct string after resetGame (no guesses)', () => {
+    const { result } = renderHook(() => useWordleGame('TESTS'));
+    const shareString = result.current.getShareString();
+    // After resetGame, currentRow = 0, so rows.length = 1 (the first empty row)
+    // Each empty letter -> status 'EMPTY' -> maps to '��������������������������������������������������������������⬜' (white square)
+    // So we expect one row of five white squares.
+    const expected = 'Wordle 1/6\n\u2B1C\u2B1C\u2B1C\u2B1C\u2B1C';
+    expect(shareString).toBe(expected);
+  });
 });
