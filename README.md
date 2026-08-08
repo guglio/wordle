@@ -1,5 +1,7 @@
 # Wordle Clone
 
+Live Demo: https://wordle.guglielmo-turco.com
+
 A simple Wordle clone built with **React**, **TypeScript**, and **Vite**.
 
 ## Features
