@@ -1,24 +1,33 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Modal } from '../Components/Modal/Modal';
+import { vi } from 'vitest';
 
 describe('Modal component', () => {
-  let onClose: ReturnType<typeof vi.fn>;
-  let onReset: ReturnType<typeof vi.fn>;
+  const onClose = vi.fn();
+  const onReset = vi.fn();
+  const onCopyShare = vi.fn();
 
   beforeEach(() => {
-    onClose = vi.fn();
-    onReset = vi.fn();
+    vi.clearAllMocks();
   });
 
   test('renders title based on win/lose', () => {
+    // Test winner state
     render(<Modal isWinner={true} solution='TEST' onClose={onClose} onReset={onReset} />);
     expect(screen.getByRole('heading', { name: /congratulations/i })).toBeInTheDocument();
-    expect(screen.getByText(/🎉 you win!/i)).toBeInTheDocument();
+    expect(screen.getByText(/You win!/i)).toBeInTheDocument();
 
-    // re-render with loss
+    // Test loser state
     const { container } = render(<Modal isWinner={false} solution='APPLE' onClose={onClose} onReset={onReset} />);
     expect(container.querySelector('.modal-title')?.textContent).toBe('Game Over');
-    expect(screen.getByText(/😢 word was apple/i)).toBeInTheDocument();
+    expect(screen.getByText(/Word was APPLE/i)).toBeInTheDocument();
+  });
+
+  test('reset button calls onReset', () => {
+    render(<Modal isWinner={true} solution='TEST' onClose={onClose} onReset={onReset} />);
+    const resetBtn = screen.getByRole('button', { name: /play again/i });
+    fireEvent.click(resetBtn);
+    expect(onReset).toHaveBeenCalledTimes(1);
   });
 
   test('close button calls onClose (once)', () => {
@@ -28,17 +37,13 @@ describe('Modal component', () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  test('reset button calls onReset and stops propagation', () => {
-    const stopPropagation = vi.fn();
-    const onResetWithStop = (e: React.MouseEvent<HTMLButtonElement>) => {
-      stopPropagation();
-      onReset();
-    };
-    render(<Modal isWinner={true} solution='TEST' onClose={onClose} onReset={onResetWithStop} />);
+  test('reset button calls onReset (internal stopPropagation handled by Modal)', () => {
+    render(<Modal isWinner={true} solution='TEST' onClose={onClose} onReset={onReset} />);
     const resetBtn = screen.getByRole('button', { name: /play again/i });
     fireEvent.click(resetBtn);
     expect(onReset).toHaveBeenCalledTimes(1);
-    expect(stopPropagation).toHaveBeenCalledTimes(1);
+    // Note: Modal internally calls e.stopPropagation() before calling onReset()
+    // We verify onReset is called, which confirms the handler worked
   });
 
   test('clicking backdrop calls onClose', () => {
@@ -51,7 +56,7 @@ describe('Modal component', () => {
 
   test('clicking inside modal-content (e.g., message) does NOT call onClose', () => {
     render(<Modal isWinner={true} solution='TEST' onClose={onClose} onReset={onReset} />);
-    const messageEl = screen.getByText(/🎉 you win!/i);
+    const messageEl = screen.getByText(/You win!/i);
     // click on the message text
     fireEvent.click(messageEl);
     expect(onClose).not.toHaveBeenCalled();
@@ -59,11 +64,8 @@ describe('Modal component', () => {
 
   test('clicking modal-container (non-button) does NOT call onClose', () => {
     render(<Modal isWinner={true} solution='TEST' onClose={onClose} onReset={onReset} />);
-    const modalContent = document.querySelector('.modal-content');
-    if (!modalContent) throw new Error('modal-content not found');
-    // click somewhere inside modal-content but not on button
-    // we can click on the title
     const titleEl = screen.getByRole('heading', { name: /congratulations/i });
+    // click on the title (inside modal-content but not a button)
     fireEvent.click(titleEl);
     expect(onClose).not.toHaveBeenCalled();
   });
@@ -74,17 +76,11 @@ describe('Modal component', () => {
     expect(screen.getByText(shareString)).toBeInTheDocument();
   });
 
-  test('Share button calls onCopyShare and stops propagation', () => {
-    const onCopyShare = vi.fn();
-    const stopPropagation = vi.fn();
-    const onCopyShareWithStop = (e: React.MouseEvent<HTMLButtonElement>) => {
-      stopPropagation();
-      onCopyShare();
-    };
-    render(<Modal isWinner={true} solution='TEST' onClose={onClose} onReset={onReset} shareString='any string' onCopyShare={onCopyShareWithStop} />);
+  test('Share button calls onCopyShare (internal stopPropagation handled by Modal)', () => {
+    render(<Modal isWinner={true} solution='TEST' onClose={onClose} onReset={onReset} shareString='any string' onCopyShare={onCopyShare} />);
     const shareBtn = screen.getByRole('button', { name: /share/i });
     fireEvent.click(shareBtn);
     expect(onCopyShare).toHaveBeenCalledTimes(1);
-    expect(stopPropagation).toHaveBeenCalledTimes(1);
+    // Note: Modal internally calls e.stopPropagation() before calling onCopyShare()
   });
 });

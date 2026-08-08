@@ -34,6 +34,7 @@ describe('useWordleGame hook', () => {
     expect(result.current.currentCol).toBe(0);
     expect(result.current.draft).toBe('');
     expect(result.current.gameOver).toBe(false);
+    expect(result.current.solution).not.toBe(initialSolution);
     expect(result.current.isWinner).toBe(false);
   });
 
