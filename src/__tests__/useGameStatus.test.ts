@@ -37,11 +37,13 @@ describe('useWordleGame hook', () => {
     expect(result.current.isWinner).toBe(false);
   });
 
-  test('getShareString returns a string', () => {
-    const solution = 'TESTS';
-    const { result } = renderHook(() => useWordleGame(solution));
+  test('getShareString returns correct string after resetGame (no guesses)', () => {
+    const { result } = renderHook(() => useWordleGame('TESTS'));
     const shareString = result.current.getShareString();
-    expect(typeof shareString).toBe('string');
-    expect(shareString.length).toBeGreaterThan(0);
+    // After resetGame, currentRow = 0, so rows.length = 1 (the first empty row)
+    // Each empty letter -> status 'EMPTY' -> maps to '��������������������������������������������������������������⬜' (white square)
+    // So we expect one row of five white squares.
+    const expected = 'Wordle 1/6\n\u2B1C\u2B1C\u2B1C\u2B1C\u2B1C';
+    expect(shareString).toBe(expected);
   });
 });
