@@ -9,6 +9,7 @@ A simple Wordle clone built with **React**, **TypeScript**, and **Vite**.
 - Random word selection from a built‑in word list.
 - Responsive layout that works on desktop and mobile.
 - Game status modal with title, close (×) button, and "Play Again" reset button.
+- Share result feature: generate a shareable string with emoji grid and copy to clipboard (like the original Wordle).
 - Easy to extend (custom word lists, animations, statistics, etc.).
 
 ## Getting Started
@@ -87,6 +88,8 @@ src/
 5. After submission we reset `draft`, move to the next row, and refocus the hidden input.
 6. The UI simply maps over `guesses` (or the draft for the active row) and renders tiles with appropriate background colors.
 7. When the game is won or lost, the `useGameStatus` hook opens a modal that displays a title (Congratulations! / Game Over), a close button (×), and a "Play Again" button to reset the game.
+8. The hook also provides a `getShareString` function that generates a shareable emoji grid (like the original Wordle) which can be copied to clipboard via the Share button in the modal.
+
 
 ## Contributing
 
