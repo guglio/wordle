@@ -140,12 +140,9 @@ export const useWordleGame = (solutionParam = 'CRANE') => {
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
-      gameState.currentCol,
-      gameState.currentRow,
       gameState.draft,
       gameState.gameOver,
       evaluateGuess,
-      gameState.solution,
     ],
   );
   useEffect(() => {
@@ -210,9 +207,18 @@ export const useWordleGame = (solutionParam = 'CRANE') => {
     return Array(MAX_GUESSES).fill(EMPTY_ROW);
   }, [gameState.draft, gameState.currentRow, gameState.guesses]);
 const resetGame = useCallback(() => {
-    const newSolution = WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)];
+    let newSolution = WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)];
+    // Ensure we don't get the same solution as the current one
+    if (newSolution === gameState.solution) {
+        // If we have more than one word, try again by picking the next one
+        if (WORD_LIST.length > 1) {
+            const index = WORD_LIST.indexOf(newSolution);
+            const newIndex = (index + 1) % WORD_LIST.length;
+            newSolution = WORD_LIST[newIndex];
+        }
+    }
     setGameState(setInitState(newSolution));
-  }, []);
+  }, [gameState.solution]);
 
   const getShareString = useCallback(() => {
     const rows = gameState.guesses
@@ -221,9 +227,9 @@ const resetGame = useCallback(() => {
         return row.letters
           .map(l => {
             switch (l.status) {
-              case 'GREEN': return '🟩';
-              case 'YELLOW': return '🟨';
-              default: return '⬜';
+              case 'GREEN': return '���🟩';
+              case 'YELLOW': return '���🟨';
+              default: return '��⬜';
             }
           })
           .join('');
