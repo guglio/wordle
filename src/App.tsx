@@ -22,8 +22,9 @@ function App() {
 
   useEffect(() => {
     if (gameOver) {
-      setShowModal(true);
-      setShareString(getShareString());
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setShowModal(() => true);
+      setShareString(() => getShareString());
     }
   }, [gameOver, getShareString]);
 

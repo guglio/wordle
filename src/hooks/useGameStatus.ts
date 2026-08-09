@@ -29,10 +29,9 @@ const setInitState = (solution: string) => {
   };
 };
 
-export const useWordleGame = (solution = 'CRANE') => {
-  solution =
-    solution || WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)];
-  const [gameState, setGameState] = useState<GameState>(setInitState(solution));
+export const useWordleGame = (solutionParam = 'CRANE') => {
+  const [solutionState] = useState<string>(() => solutionParam || WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)]);
+  const [gameState, setGameState] = useState<GameState>(setInitState(solutionState));
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -42,16 +41,16 @@ export const useWordleGame = (solution = 'CRANE') => {
 
   const evaluateGuess = useCallback(
     (guessWord: string) => {
-      const solutionChars = gameState.solution.split('');
-      const guessChars = guessWord.split('');
+      const solutionChars: (string | null)[] = gameState.solution.split('');
+      const guessChars: (string | null)[] = guessWord.split('');
 
       const status: LetterStatus[] = Array(WORD_LENGTH).fill('GREY');
 
       guessChars.forEach((letter, i) => {
         if (letter === solutionChars[i]) {
           status[i] = 'GREEN';
-          solutionChars[i] = null as any;
-          guessChars[i] = null as any;
+          solutionChars[i] = null;
+          guessChars[i] = null;
         }
       });
 
@@ -60,7 +59,7 @@ export const useWordleGame = (solution = 'CRANE') => {
         const idx = solutionChars.indexOf(letter);
         if (idx !== -1) {
           status[i] = 'YELLOW';
-          solutionChars[idx] = null as any;
+          solutionChars[idx] = null;
         }
       });
 
@@ -140,11 +139,9 @@ export const useWordleGame = (solution = 'CRANE') => {
       }
     },
     [
-      gameState.currentCol,
-      gameState.currentRow,
       gameState.draft,
       gameState.gameOver,
-      gameState.solution,
+      evaluateGuess,
     ],
   );
   useEffect(() => {
@@ -163,7 +160,7 @@ export const useWordleGame = (solution = 'CRANE') => {
       } as const,
       'aria-label': 'Wordle guess input',
     }),
-    [handleKey],
+    [handleKey, handleInputBlur],
   );
 
   const getRowLetters = useCallback(
@@ -209,9 +206,18 @@ export const useWordleGame = (solution = 'CRANE') => {
     return Array(MAX_GUESSES).fill(EMPTY_ROW);
   }, [gameState.draft, gameState.currentRow, gameState.guesses]);
 const resetGame = useCallback(() => {
-    const newSolution = WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)];
+    let newSolution = WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)];
+    // Ensure we don't get the same solution as the current one
+    if (newSolution === gameState.solution) {
+        // If we have more than one word, try again by picking the next one
+        if (WORD_LIST.length > 1) {
+            const index = WORD_LIST.indexOf(newSolution);
+            const newIndex = (index + 1) % WORD_LIST.length;
+            newSolution = WORD_LIST[newIndex];
+        }
+    }
     setGameState(setInitState(newSolution));
-  }, []);
+  }, [gameState.solution]);
 
   const getShareString = useCallback(() => {
     const rows = gameState.guesses
@@ -234,7 +240,7 @@ const resetGame = useCallback(() => {
 
   return {
     ...gameState,
-    solution,
+    solutionState,
     evaluateGuess,
     getInputProps,
     getRowLetters,

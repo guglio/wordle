@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitest/config';
 import viteConfig from './vite.config';
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(() => {
   return {
     ...viteConfig,
     test: {
