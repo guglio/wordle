@@ -138,7 +138,6 @@ export const useWordleGame = (solutionParam = 'CRANE') => {
         }));
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       gameState.draft,
       gameState.gameOver,
@@ -227,9 +226,9 @@ const resetGame = useCallback(() => {
         return row.letters
           .map(l => {
             switch (l.status) {
-              case 'GREEN': return '���🟩';
-              case 'YELLOW': return '���🟨';
-              default: return '��⬜';
+              case 'GREEN': return '🟩';
+              case 'YELLOW': return '🟨';
+              default: return '⬜';
             }
           })
           .join('');
